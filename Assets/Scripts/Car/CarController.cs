@@ -36,6 +36,7 @@ public class CarController : MonoBehaviour, ICollisionReceiver
     [SerializeField] private float m_BrakeTorque;
     [SerializeField] GameObject explosionSystem;
     [SerializeField] float explosionThreshold;
+    [SerializeField] Renderer stopLights;
 
     private Quaternion[] m_WheelMeshLocalRotations;
     private Vector3 m_Prevpos, m_Pos;
@@ -220,6 +221,8 @@ public class CarController : MonoBehaviour, ICollisionReceiver
             m_WheelColliders[2].brakeTorque = hbTorque;
             m_WheelColliders[3].brakeTorque = hbTorque;
         }
+            
+        stopLights.enabled = (footbrake > 0.0f || handbrake > 0.0f);
 
 
         CalculateRevs();

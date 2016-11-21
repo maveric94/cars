@@ -5,16 +5,16 @@ using System.Collections;
 public class CarsController : MonoBehaviour 
 {
     [SerializeField] new AutoCam camera;
-    [SerializeField] CarController playerCar;
     [SerializeField] GameObject carsObject;
 
     CarController[] cars;
+    CarController currentCar;
     int currentCarIndex = 0;
 
     void Awake()
     {
         cars = carsObject.GetComponentsInChildren<CarController>();
-        camera.SetTarget(playerCar.transform);
+        SetTarget();
     }
 
 
@@ -24,32 +24,64 @@ public class CarsController : MonoBehaviour
         {
             UnityEngine.SceneManagement.SceneManager.LoadScene("Main");
         }
-    }
-
-
-    void OnGUI()
-    {
-        if (GUI.Button(new Rect(0.0f, 0.0f, 200.0f, 200.0f), "Player car"))
+        if (Input.GetKeyDown(KeyCode.Q))
         {
-            camera.SetTarget(playerCar.transform);
-        }
-
-        if (GUI.Button(new Rect(200.0f, 0.0f, 200.0f, 200.0f), "Next car"))
-        {
-            camera.SetTarget(cars[currentCarIndex++].transform);
+            currentCarIndex++;
             if (currentCarIndex >= cars.Length)
             {
                 currentCarIndex = 0;
             }
+
+            SetTarget();    
         }
 
-        if (GUI.Button(new Rect(400.0f, 0.0f, 200.0f, 200.0f), "Prev car"))
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            camera.SetTarget(cars[currentCarIndex--].transform);
+            currentCarIndex--;
             if (currentCarIndex <= 0)
             {
                 currentCarIndex = cars.Length - 1;
             }
+
+            SetTarget();   
         }
+    }
+        
+
+    void SetTarget()
+    {
+        camera.SetTarget(cars[currentCarIndex].transform);
+        CarController newCar = cars[currentCarIndex];
+
+        CarAIControl aiControl = newCar.GetComponent<CarAIControl>();
+        CarUserControl userControl = newCar.GetComponent<CarUserControl>();
+
+        if (aiControl)
+        {
+            aiControl.enabled = false;
+        }
+
+        if (userControl)
+        {
+            userControl.enabled = true;
+        }
+
+        if (currentCar)
+        {
+            aiControl = currentCar.GetComponent<CarAIControl>();
+            userControl = currentCar.GetComponent<CarUserControl>();
+
+            if (aiControl)
+            {
+                aiControl.enabled = true;
+            }
+
+            if (userControl)
+            {
+                userControl.enabled = false;
+            }
+        }
+
+        currentCar = newCar;
     }
 }
